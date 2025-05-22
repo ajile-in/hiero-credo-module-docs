@@ -12,12 +12,11 @@ views {
       internet.customer
 
     exclude
-      boutique.frontend -> boutique.payments,
-      boutique.* -> prod.dbvm2.db,
-      boutique.payments -> prod.dbvm2.db,
-      boutique.shipping -> prod.dbvm2.db
+      credebl.studio -> credebl.wallets,
+      credebl.* -> prod.dbvm2.agent-db,
+      credebl.wallets -> prod.dbvm2.agent-db,
 
-    style boutique.frontend, prod.appvms._ {
+    style credebl.studio, prod.appvms._ {
       multiple true
     }
     style prod {

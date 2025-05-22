@@ -19,6 +19,7 @@ specification {
     style {
       opacity 20%
       color secondary
+      shape storage
     }
   }
 
@@ -42,12 +43,36 @@ specification {
       shape mobile
     }
   }
+  element storage {
+    notation "Data storage"
+    style {
+      color secondary
+      opacity 35%
+      shape storage
+      border none
+    }
+  }
   element database {
     notation "Database"
     style {
       shape storage
     }
   }
+
+  element file-system {
+    notation "File System"
+    style {
+      shape storage
+    }
+  }
+
+  element ledger {
+    notation "Distributed Ledger"
+    style {
+      shape storage
+    }
+  }
+
   element db_table {
     notation "Database Table"
     style {

@@ -12,164 +12,163 @@ views {
     '
     include
       *,
-      -> boutique.*
+      -> credebl.*
+
+    style customer, credebl.studio {
+      multiple true
+    }      
   }
 
-  view boutique of boutique {
+  view credebl of credebl {
     description '
-      E-commerce app for browsing items, add them to the cart,
-      and purchasing them.
+      Decentralized Identity Platform for managing issuance, storage & verification of verifiable credentials.
     '
     include
       *,
+      -> credebl.*,
+      -> storage,
+      -> hiero-ledger,
+      -> ipfs,
+      -> file-server,
       customer with {
         size sm
       }
-    exclude
-      frontend -> actionLog,
-      payment-gateway,
-      email-provider
 
-    style db, frontend {
+    style customer, credebl.studio {
       multiple true
+    }      
+    style credebl {
+      opacity 10%
     }
-    style boutique {
-      opacity 0%
+    style hiero-ledger {
+      color red
+    }
+    style ipfs {
+      color sky
     }
   }
 
-  view frontend of boutique.frontend {
+  view studio of credebl.studio {
     include
       *,
-      boutique
+      credebl
 
     style * {
       color secondary
       opacity 10%
     }
 
-    style frontend._ {
+    style studio._ {
       color green
     }
   }
 
-  view checkout of boutique.checkout {
-    description '
-      Retrieves user cart, prepares order and
-      orchestrates the payment, shipping and the email notification.
-    '
-    link https://github.com/likec4/template 'Repository'
+  view platform of credebl.platform {
     include
       *,
-      boutique,
-      customer,
-      payment-gateway,
-      email-provider
+      credebl.platform,
+
+      credebl.platform.*
+      -> ipfs,
+      -> hiero-ledger,
+      -> credebl.file-server,
+      -> credebl.agent-db,
+
+    style platform._ {
+      color primary
+      opacity 10%
+    }
+  }
+
+  view controller of credebl.controller {
+    include
+      *,
+      credebl,
+      credebl.platform,
+      controller.*,
+      -> ipfs,
+      -> hiero-ledger,
+      -> credebl.file-server,
+      -> credebl.agent-db,
 
     style * {
-      color secondary
-    }
-    style boutique {
       color muted
       opacity 10%
     }
-
-    style checkout._ {
-      color green
+    style controller._ {
+      color primary
+      opacity 10%
     }
   }
 
-  view cart of boutique.cart {
+  view agent of credebl.controller.agent {
     include
       *,
-      boutique.frontend.* -> cart.*,
-      boutique,
-      customer
-
+      credebl,
+      credebl.controller,
+      credebl.platform.agent-service,
+      -> credebl.platform.agent-service,
+      
     style * {
-      color secondary
-      opacity 0%
-    }
-
-    style cart._ {
-      opacity 100%
-      color green
-    }
-  }
-
-  view payments of boutique.payments {
-    include
-      *,
-      boutique,
-      customer,
-      -> boutique.db.*,
-      boutique.checkout
-
-    style * {
-      color secondary
-    }
-    style boutique {
       color muted
       opacity 10%
     }
-
-    style payments._ {
-      color green
+    style agent._ {
+      color primary
+      opacity 10%
     }
   }
 
-  view actionLog of boutique.actionLog {
+  view hiero-module of credebl.controller.agent.hiero-module {
     include
-      *
+      *,
+      credebl,
+      credebl.controller,
+      credebl.controller.agent,
+      -> credebl.platform.agent-service,
+      -> credebl.agent-db.*,
+      -> credebl.file-server.*
 
+    style hiero-module._ {
+      color green
+    }
+    style hiero-module.hiero-did-sdk {
+      color secondary
+      opacity 20%
+    }
+    style hiero-module.hiero-schema-sdk {
+      color secondary
+      opacity 20%
+    }
     style * {
       color secondary
-    }
-    style actionLog {
-      color green
+      opacity 10%
     }
   }
 
-  view shipping of boutique.shipping {
+  view storage of credebl.storage {
     include
       *,
-      -> boutique.db.*,
-      boutique
-
-    style * {
-      color secondary
-      opacity 0%
-    }
-    style shipping {
-      color green
-    }
-  }
-
-  view database of boutique.db {
-    include
-      *,
-      boutique
-
-    style boutique {
-      opacity 0%
-    }
-    style boutique.db._ {
-      icon tech:postgresql
-    }
-  }
-
-  view catalogue of boutique.catalogue {
-    include
-      *,
-      -> boutique.db.*,
-      boutique
+      credebl.*,
+      credebl.platform.*,
+      credebl.platform.controller.*,
+      credebl.credebl-db,
+      credebl.agent-db,
+      credebl.file-server
 
     style * {
       color secondary
       opacity 10%
     }
-    style catalogue {
-      color green
+
+    style credebl {
+      opacity 10%
+    }
+    style credebl.platform {
+      opacity 20%
+    }
+    style storage._ {
+      color primary
     }
   }
 }

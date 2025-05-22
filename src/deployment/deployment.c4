@@ -28,16 +28,15 @@ deployment {
     devmachine = vm 'Developer Machine' {
       technology 'Ubuntu'
 
-      instanceOf boutique.frontend
-      instanceOf boutique.catalogue
-      instanceOf boutique.cart
-      instanceOf boutique.checkout
+      instanceOf credebl.studio
+      instanceOf credebl.wallet-ui
+      // instanceOf credebl.create-did
     }
 
     containers = vm 'Shared Containers' {
-      instanceOf boutique.payments
-      instanceOf boutique.shipping
-      instanceOf boutique.db
+      instanceOf credebl.wallets
+      instanceOf credebl.credebl-db
+      instanceOf credebl.agent-db
     }
   }
 
@@ -49,30 +48,30 @@ deployment {
     description 'Production environment.'
 
     vm1 = vm 'Web Server 1' {
-      instanceOf boutique.frontend
-      instanceOf boutique.cart
-      instanceOf boutique.catalogue
+      instanceOf credebl.studio
+      instanceOf credebl.wallet-ui
     }
 
     vm2 = vm 'Web Server 2' {
-      instanceOf boutique.frontend
-      instanceOf boutique.cart
-      instanceOf boutique.catalogue
+      instanceOf credebl.studio
+      instanceOf credebl.wallet-ui
     }
 
     appvms = vm 'Application Servers (x2)' {
-      instanceOf boutique.checkout
-      instanceOf boutique.payments
-      instanceOf boutique.shipping
+      // instanceOf credebl.create-did
+      instanceOf credebl.wallets
     }
 
     dbvm1 = vm 'Database Server 1' {
-      instanceOf boutique.db
+      instanceOf credebl.credebl-db
+      instanceOf credebl.agent-db
     }
     dbvm2 = vm 'Database Server 2' {
-      instanceOf boutique.db
+      instanceOf credebl.credebl-db
+      instanceOf credebl.agent-db
     }
 
-    dbvm1.db -> dbvm2.db 'replicates'
+    dbvm1.credebl-db -> dbvm2.credebl-db 'replicates'
+    dbvm1.agent-db -> dbvm2.agent-db 'replicates'
   }
 }

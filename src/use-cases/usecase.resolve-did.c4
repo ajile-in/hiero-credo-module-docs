@@ -1,0 +1,44 @@
+views {
+
+  dynamic view resolveDidFlow {
+    title 'Usecase 02: Resolve a DID'
+    description '
+      This use case describes the process of resolving a DID to a DIDDoc.
+    '
+
+    customer -> credebl 'create DID' {
+      navigateTo createDidFlow
+      notes '
+        The customer interacts with the web application to place an order.
+      '
+    }
+    hiero-ledger <- credebl 'initiates payment' {
+      notes '
+        Payment service initiates payment processing, which may take a few seconds to a few minutes.
+      '
+    }
+    hiero-ledger -> credebl.wallets 'confirms payment with webnook' {
+      notes '
+        When customer completes the payment, the payment gateway sends a confirmation as a webhook.
+      '
+    }
+    // credebl.wallets -> credebl.create-did 'confirms pending payment'
+
+    parallel {
+      // credebl.create-did -> credebl.db 'updates DID status' {
+      //   notes '
+      //     The DID status is updated to "created".
+      //   '
+      // }
+    }
+    
+
+    include
+      credebl with {
+        color muted
+        opacity 5%
+      }
+
+    autoLayout TopBottom
+  }
+}

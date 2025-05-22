@@ -1,0 +1,67 @@
+views {
+  dynamic view createDidFlow {
+    title 'Usecase 01: Creating a DID'
+    description '
+      This use case describes the process of creating a new DID.
+    '
+
+    customer -> credebl.studio 'creates a new did:hedera DID' {
+      notes '
+        The customer interacts with the web application to create a new DID.
+      '
+    }
+    customer -> credebl.studio 'enters shipping information' {
+      notes '
+        Custmer enters shipping information to get shipping cost estimates.
+      '
+    }
+    customer -> credebl.studio 'enters payment information' {
+      notes '
+        Customer enters payment information and confirms the order.
+      '
+    }
+    // credebl.studio -> credebl.create-did 'initiates payment'
+    // credebl.create-did -> credebl.db 'persists order'
+    parallel {
+      // credebl.create-did -> credebl.wallets 'creates DID' {
+      //   notes '
+      //     Initiates DID creation.
+      //   '
+      // }
+    }
+    credebl.wallets -> hiero-ledger 'processes did requests'
+    hiero-ledger -> hiero-ledger 'processes DID requests' {
+      notes '
+        This is a asynchronous process that may take a few seconds to a few minutes.
+
+        Customer may be prompted to enter additional information or confirm the payment.
+      '
+    }
+    credebl.wallets <- hiero-ledger 'confirms DID operation with webhook' {
+      notes '
+        When ledger completes the transaction, the Hiero SDK sends a confirmation as a webhook.
+      '
+    }
+
+    // credebl.create-did <- credebl.wallets
+    // parallel {
+    //   credebl.create-did -> credebl.db 'updates wallet status' {
+    //     notes '
+    //       The wallet status is updated.
+    //     '
+    //   }
+    // }
+
+    include
+      credebl with {
+        color gray
+        opacity 10%
+      }
+    style customer {
+      color green
+    }
+    style hiero-ledger {
+      color muted
+    }
+  }
+}
