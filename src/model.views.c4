@@ -1,7 +1,7 @@
 views {
 
-  view index {
-    title 'System Landscape'
+  view index of credebl {
+    title 'CREDEBL - System Landscape'
     include
       *
   }
@@ -69,11 +69,17 @@ views {
       credebl.platform,
 
       credebl.platform.*
+      -> credebl.gateway,
+      -> credebl.nats,
+      -> credebl.services.*,
+      -> credebl.services.agent-service,
+      -> credebl.services.controller,
+      -> credebl.file-server,
+      -> credebl.credebl-db,
+      -> credebl.agent-db,
       -> ipfs,
       -> hiero-ledger,
-      -> credebl.file-server,
-      -> credebl.agent-db,
-
+      
     style platform._ {
       color primary
       opacity 10%
@@ -146,12 +152,38 @@ views {
     }
   }
 
+  view services of credebl.services {
+      include
+        *,
+        credebl.*,
+        credebl.platform.*,
+        credebl.platform.agent-service,
+        credebl.platform.controller,
+
+      style * {
+        color secondary
+        opacity 10%
+      }
+
+      style credebl {
+        opacity 10%
+      }
+      style credebl.platform {
+        opacity 20%
+      }
+      style services._ {
+        color primary
+      }
+  }
+
   view storage of credebl.storage {
     include
       *,
       credebl.*,
       credebl.platform.*,
-      credebl.platform.controller.*,
+      credebl.platform.services.*,
+      credebl.platform.services.agent-service,
+      credebl.platform.services.controller,
       credebl.credebl-db,
       credebl.agent-db,
       credebl.file-server

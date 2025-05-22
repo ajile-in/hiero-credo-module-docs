@@ -11,7 +11,7 @@ model {
 
   customer -> credebl 'uses'
   customer -> studio 'opens in browser'
-  studio -> agent-service
+  studio -> gateway
 
   credebl = system 'CREDEBL System' {
 
@@ -29,10 +29,12 @@ model {
         description 'Displays organization wallet & DIDs'
       }
 
-      wallet-ui -> platform 'calls wallet API' {
-        description 'Provides access to wallet data'
+      // wallet-ui -> platform 'calls wallet API' {
+      //   description 'Provides access to wallet data'
+      // }
+      wallet-ui -> platform.gateway 'sends & receives client requests/responses' {
+        description 'Provides access to micro-services'
       }
-      wallet-ui -> platform.agent-service 'consumes DID & Schema APIs'
     }
 
     platform = service 'CREDEBL Platform' {
@@ -41,62 +43,91 @@ model {
       description 'Provides access to micro-services'
       link https://github.com/credebl/platform
 
-      agent-service = service 'Agent Service' {
-        icon tech:nestjs
-        description "Manages all the interactions with the Credo Agent"
+      gateway = system 'API Gateway' {
+        icon tech:nginx
+        technology 'NGINX'
+        description 'Provides access to micro-services'
 
-        api = component 'Wallet API' {
-          icon tech:express
-          technology 'express.js'
-          description 'Provides access to wallet data'
+        -> nats 'routes requests to micro-services' {
+          description 'Provides access to micro-services'
         }
-
-        api -> controller 'Stores & Gets wallet data'
-        api -> credebl-db 'Stores user & org data'
+        -> studio 'Returns response to web app' {
+          description 'Returns response to web app'
+        }
       }
 
-      controller = service 'Controller Service' {
+      nats = messaging 'NATS Messaging' {
+        icon https://nats.io/img/logos/nats-horizontal-color.png
+        technology 'NATS'
+        description 'Provides access to micro-services'
+        link https://nats.io
+
+        -> services.agent-service 'Sends & receives messages' {
+          description 'Provides access to micro-services'
+        }
+
+        -> services.controller 'Sends & receives messages' {
+          description 'Provides access to micro-services'
+        }
+        
+        -> gateway 'Returns response back to clients' {
+          description 'Returns response back to clients'
+        }
+      }
+
+      services = microservices 'Microservices' {
         icon tech:nestjs
-        technology 'express.js'
-        description 'Provides REST API endpoints to the Credo Agent'
-        link https://github.com/credebl/credo-controller
+        description 'Pool of micro-services'
 
-        controller -> credebl.agent-db
+        agent-service = service 'Agent Service' {
+          icon tech:nestjs
+          description "Manages all the interactions with the Credo Agent"
 
-        agent = component 'Credo Agent' {
-          icon tech:typescript
-          technology 'node.js'
-          description 'Manages all the decentralized Id & Verifiable Credential operations'
+          -> controller 'Stores & Gets wallet data'
+          -> credebl-db 'Stores user & org data'
+        }
 
-          -> agent-db 'Stores wallet data'
+        controller = service 'Controller Service' {
+          icon tech:nestjs
+          technology 'express.js'
+          description 'Provides REST API endpoints to the Credo Agent'
+          link https://github.com/credebl/credo-controller
 
-          hiero-module = component 'Hiero Module' {
+          agent = component 'Credo Agent' {
             icon tech:typescript
-            technology 'TypeScript SDK'
-            description 'Credo Module for Hiero ledger'
-            link https://github.com/ayanworks/credo-hedera-module
+            technology 'node.js'
+            description 'Manages all the decentralized Id & Verifiable Credential operations'
 
-            hiero-did-sdk = component 'Hiero DID SDK' {
-              icon tech:npm
+            -> agent-db 'Stores wallet data'
+
+            hiero-module = component 'Hiero Module' {
+              icon tech:typescript
               technology 'TypeScript SDK'
-              description 'Manages all DID related operations with the Hiero ledger'
+              description 'Credo Module for Hiero ledger'
+              link https://github.com/ayanworks/credo-hedera-module
 
-              -> hiero-ledger 'Writes & resolves DIDs' {
-                description 'Manages all DID operations with Hiero ledger'
-              }
-            }
+              hiero-did-sdk = component 'Hiero DID SDK' {
+                icon tech:npm
+                technology 'TypeScript SDK'
+                description 'Manages all DID related operations with the Hiero ledger'
 
-            hiero-schema-sdk = component 'Hiero Schema SDK' {
-              icon tech:npm
-              technology 'TypeScript SDK'
-              description 'Manages all Schema operations with the Hiero ledger'
-
-              -> ipfs 'Writes & Resolves a Schema' {
-                description 'Writes schemas on to the IPFS'
+                -> hiero-ledger 'Writes & resolves DIDs' {
+                  description 'Manages all DID operations with Hiero ledger'
+                }
               }
 
-              -> file-server 'Writes & Resolves Schemas' {
-                description 'Writes a new DID to the Hiero ledger.'
+              hiero-schema-sdk = component 'Hiero Schema SDK' {
+                icon tech:npm
+                technology 'TypeScript SDK'
+                description 'Manages all Schema operations with the Hiero ledger'
+
+                -> ipfs 'Writes & Resolves a Schema' {
+                  description 'Writes schemas on to the IPFS'
+                }
+
+                -> file-server 'Writes & Resolves Schemas' {
+                  description 'Writes a new DID to the Hiero ledger.'
+                }
               }
             }
           }
@@ -166,5 +197,5 @@ model {
     }
 
   }
-  
+
 }

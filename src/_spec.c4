@@ -14,6 +14,14 @@ specification {
     }
   }
 
+  element messaging {
+    notation "Messaging System"
+    style {
+      opacity 20%
+      shape queue
+    }
+  }
+
   element external-system {
     notation "External Software System"
     style {
@@ -24,12 +32,21 @@ specification {
   }
 
   element application
-
   element component {
     style {
       opacity 20%
     }
   }
+
+  element microservices {
+    notation "Microservices"
+    style {
+      color secondary
+      opacity 35%
+      shape rectangle
+    }
+  }
+
   element service
   element webapp {
     notation "Web Application"
